@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  geoipserver:
+    build: docker
+    volumes:
+      - .:/code
+    working_dir: /code
+    command: go run main.go
+    env_file:
+      - docker-compose.env
+  console:
+    build: docker
+    volumes:
+      - .:/code
+    env_file:
+      - docker-compose.env
