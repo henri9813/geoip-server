@@ -4,6 +4,7 @@ go:
   - 1.12
 
 before_script:
+  - make download
   - go get golang.org/x/lint/golint
 
 script:
