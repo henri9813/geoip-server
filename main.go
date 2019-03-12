@@ -11,9 +11,9 @@ import (
 	"net/http"
 )
 
-var cityDatabase *geoip2.Reader = nil
-var countryDatabase *geoip2.Reader = nil
-var asnDatabase *geoip2.Reader = nil
+var cityDatabase *geoip2.Reader
+var countryDatabase *geoip2.Reader
+var asnDatabase *geoip2.Reader
 
 func main()  {
 	fmt.Println("Starting server")
@@ -23,7 +23,7 @@ func main()  {
 	asnDatabase, _ = loadDatabase("ASN")
 
 	r := mux.NewRouter()
-	r.HandleFunc("/{database}/{address}", GeoIpHandler)
+	r.HandleFunc("/{database}/{address}", geoIPHandler)
 
 	err := http.ListenAndServe(":80", r)
 	if err != nil {
@@ -31,7 +31,7 @@ func main()  {
 	}
 }
 
-func GeoIpHandler(w http.ResponseWriter, r *http.Request) {
+func geoIPHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	address := net.ParseIP(vars["address"])
 
@@ -67,12 +67,12 @@ func GeoIpHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	ipJson, err := json.Marshal(ip)
+	ipJSON, err := json.Marshal(ip)
 	if err != nil {
 		log.Fatal("Cannot encode to JSON ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	_, _ = fmt.Fprint(w, string(ipJson))
+	_, _ = fmt.Fprint(w, string(ipJSON))
 }
 
 func loadDatabase(name string) (database *geoip2.Reader, err error){

@@ -3,9 +3,12 @@ language: go
 go:
   - 1.12
 
+env:
+  - GO111MODULE=on
+
 before_script:
   - make download
-  - go get golang.org/x/lint/golint
+  - make install
 
 script:
   - gofmt -s -l .

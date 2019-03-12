@@ -8,3 +8,12 @@ define download_database
 	tar -xzf "/tmp/${1}.tar.gz" -C data --wildcards "*.mmdb" --strip-components 1
 	rm "/tmp/${1}.tar.gz"
 endef
+
+install:
+	go get golang.org/x/lint/golint
+	go mod download
+
+cs:
+	gofmt -s -l .
+	go vet ./...
+	golint -set_exit_status $(go list ./...)
