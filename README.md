@@ -1,4 +1,6 @@
 # geoip-server
+[![Build Status](https://travis-ci.com/henri9813/geoip-server.svg?branch=master)](https://travis-ci.com/henri9813/geoip-server)
+ 
  A simple web GeoIP server
  
 # Usage
