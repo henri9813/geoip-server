@@ -1,34 +1,78 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/oschwald/geoip2-golang"
+	"github.com/gorilla/mux"
 	"log"
 	"net"
+	"net/http"
 )
+
+var cityDatabase *geoip2.Reader = nil
+var countryDatabase *geoip2.Reader = nil
+var asnDatabase *geoip2.Reader = nil
 
 func main()  {
 	fmt.Println("Starting server")
 
-	cityDatabase, err := loadDatabase("City")
+	cityDatabase, _ = loadDatabase("City")
+	countryDatabase, _ = loadDatabase("Country")
+	asnDatabase, _ = loadDatabase("ASN")
+
+	r := mux.NewRouter()
+	r.HandleFunc("/{database}/{address}", GeoIpHandler)
+
+	err := http.ListenAndServe(":80", r)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+}
 
-	countryDatabase, err := loadDatabase("Country")
-	if err != nil {
-		log.Fatal(err.Error())
+func GeoIpHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	address := net.ParseIP(vars["address"])
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	var ip interface{}
+	var err error
+
+	switch database := vars["database"]; database {
+	case "asn":
+		ip, err = asnDatabase.ASN(address)
+		if err != nil {
+			_,_ = fmt.Fprintln(w, "IP not found")
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	case "city":
+		ip, err = cityDatabase.City(address)
+		if err != nil {
+			_,_ = fmt.Fprintln(w, "IP not found")
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	case "country":
+		ip, err = countryDatabase.ASN(address)
+		if err != nil {
+			_,_ = fmt.Fprintln(w, "IP not found")
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	default:
+		_, _ = fmt.Fprintln(w, "Unknown database")
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
-
-	asnDatabase, err := loadDatabase("ASN")
+	ipJson, err := json.Marshal(ip)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("Cannot encode to JSON ", err)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
-
-	fmt.Println(cityDatabase.City(net.ParseIP("8.8.8.8")))
-	fmt.Println(countryDatabase.Country(net.ParseIP("8.8.8.8")))
-	fmt.Println(asnDatabase.ASN(net.ParseIP("8.8.8.8")))
+	_, _ = fmt.Fprint(w, string(ipJson))
 }
 
 func loadDatabase(name string) (database *geoip2.Reader, err error){
