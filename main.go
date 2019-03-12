@@ -43,30 +43,21 @@ func geoIPHandler(w http.ResponseWriter, r *http.Request) {
 	switch database := vars["database"]; database {
 	case "asn":
 		ip, err = asnDatabase.ASN(address)
-		if err != nil {
-			_,_ = fmt.Fprintln(w, "IP not found")
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
 	case "city":
 		ip, err = cityDatabase.City(address)
-		if err != nil {
-			_,_ = fmt.Fprintln(w, "IP not found")
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
 	case "country":
 		ip, err = countryDatabase.ASN(address)
-		if err != nil {
-			_,_ = fmt.Fprintln(w, "IP not found")
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
 	default:
 		_, _ = fmt.Fprintln(w, "Unknown database")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	if err != nil {
+		_,_ = fmt.Fprintln(w, "IP not found")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	ipJSON, err := json.Marshal(ip)
 	if err != nil {
 		log.Fatal("Cannot encode to JSON ", err)
