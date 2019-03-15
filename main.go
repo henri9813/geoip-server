@@ -46,7 +46,7 @@ func geoIPHandler(w http.ResponseWriter, r *http.Request) {
 	case "city":
 		ip, err = cityDatabase.City(address)
 	case "country":
-		ip, err = countryDatabase.ASN(address)
+		ip, err = countryDatabase.Country(address)
 	default:
 		_, _ = fmt.Fprintln(w, "Unknown database")
 		w.WriteHeader(http.StatusNotFound)

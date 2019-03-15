@@ -16,3 +16,7 @@ script:
   - golint -set_exit_status $(go list ./...)
   - go test -race -coverprofile=coverage.txt -covermode=atomic
 
+after_script:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t henri9813/geoip-server:latest .
+  - docker push henri9813/geoip-server:latest
