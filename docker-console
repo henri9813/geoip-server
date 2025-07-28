@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-if [ "$#" -ge 1 ]; then
-    docker-compose exec --user $(whoami) console "$@"
-else
-    docker-compose exec --user $(whoami) console bash
-fi

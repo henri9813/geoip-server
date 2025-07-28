@@ -20,7 +20,7 @@ user@machine $ curl http://geoipserver/asn/8.8.8.8
 
 ## Download database
 
-To automatically download MaxMind GeoIpLite you can use the makefile as follow:
+To automatically download [bgp.tools]("https://bgp.tools") you can use the makefile as follow:
 ```bash
 make download
 ```
@@ -36,5 +36,5 @@ go run main.go
 
 Please up the docker-compose.
 ```bash
-docker-compose up -d
+docker compose up
 ```
