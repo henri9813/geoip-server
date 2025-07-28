@@ -1,3 +1,5 @@
-docker-compose.env
-data/*.mmdb
+data/*
+!data/.gitkeep
 vendor
+cover.html
+cover.out

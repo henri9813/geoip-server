@@ -1,0 +1,21 @@
+services:
+  geoipserver:
+    image: golang:1.24-alpine
+    volumes:
+      - .:/app
+      - ./data:/data
+    working_dir: /app/cmd/api
+    command: go run main.go
+    env_file:
+      - .env
+    ports:
+      - 8000:80
+
+  test:
+    image: henri9813/golang-test
+    volumes:
+      - ./:/app
+      - ./data:/data
+    working_dir: /app
+    env_file:
+      - .env
